@@ -1,40 +1,42 @@
 group 'zhuoyuan.li.fluttershareme'
 version '1.0-SNAPSHOT'
 
-buildscript {
-    repositories {
-        google()
-        jcenter()
-        mavenCentral()
-    }
-
-    dependencies {
-        classpath 'com.android.tools.build:gradle:3.2.1'
-    }
+plugins {
+    id 'com.android.library' version '8.5.1'
 }
 
-rootProject.allprojects {
-    repositories {
-        google()
-        jcenter()
-    }
+repositories {
+    google()
+    mavenCentral()
 }
-
-apply plugin: 'com.android.library'
 
 android {
-    compileSdkVersion 28
+    namespace 'zhuoyuan.li.fluttershareme'
+    compileSdk 35
 
     defaultConfig {
-        minSdkVersion 16
+        minSdk 19
+        targetSdk 35
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
-    lintOptions {
-        disable 'InvalidPackage'
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+
+    buildFeatures {
+        buildConfig false
+    }
+
+    packagingOptions {
+        jniLibs {
+            useLegacyPackaging = false
+        }
     }
 }
 
 dependencies {
-    implementation 'com.facebook.android:facebook-share:5.15.3'
+    implementation 'com.facebook.android:facebook-share:18.0.3'
     // implementation 'com.twitter.sdk.android:twitter:3.1.1' //twitter share
 }
