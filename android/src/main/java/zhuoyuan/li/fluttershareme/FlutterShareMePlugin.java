@@ -2,6 +2,7 @@ package zhuoyuan.li.fluttershareme;
 
 
 import android.app.Activity;
+import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageInfo;
@@ -37,7 +38,6 @@ import io.flutter.plugin.common.MethodCall;
 import io.flutter.plugin.common.MethodChannel;
 import io.flutter.plugin.common.MethodChannel.MethodCallHandler;
 import io.flutter.plugin.common.MethodChannel.Result;
-import io.flutter.plugin.common.PluginRegistry.Registrar;
 
 /**
  * FlutterShareMePlugin
@@ -59,24 +59,17 @@ public class FlutterShareMePlugin implements MethodCallHandler, FlutterPlugin, A
     private static CallbackManager callbackManager;
     private MethodChannel methodChannel;
 
-    /**
-     * Plugin registration.
-     */
-    public static void registerWith(Registrar registrar) {
-        final FlutterShareMePlugin instance = new FlutterShareMePlugin();
-        instance.onAttachedToEngine(registrar.messenger());
-        instance.activity = registrar.activity();
-    }
-
     @Override
-    public void onAttachedToEngine(FlutterPluginBinding binding) {
+    public void onAttachedToEngine(@NonNull FlutterPluginBinding binding) {
         onAttachedToEngine(binding.getBinaryMessenger());
     }
 
     @Override
     public void onDetachedFromEngine(@NonNull FlutterPluginBinding binding) {
-        methodChannel.setMethodCallHandler(null);
-        methodChannel = null;
+        if (methodChannel != null) {
+            methodChannel.setMethodCallHandler(null);
+            methodChannel = null;
+        }
         activity = null;
     }
 
@@ -95,6 +88,9 @@ public class FlutterShareMePlugin implements MethodCallHandler, FlutterPlugin, A
     @Override
     public void onMethodCall(MethodCall call, @NonNull Result result) {
         String url, msg, fileType;
+        if (!ensureActivity(result)) {
+            return;
+        }
         switch (call.method) {
             case _methodFaceBook:
                 url = call.argument("url");
@@ -370,23 +366,31 @@ public class FlutterShareMePlugin implements MethodCallHandler, FlutterPlugin, A
     }
 
     @Override
-    public void onAttachedToActivity(ActivityPluginBinding binding) {
+    public void onAttachedToActivity(@NonNull ActivityPluginBinding binding) {
         activity = binding.getActivity();
     }
 
     @Override
     public void onDetachedFromActivityForConfigChanges() {
-
+        activity = null;
     }
 
     @Override
-    public void onReattachedToActivityForConfigChanges(ActivityPluginBinding binding) {
+    public void onReattachedToActivityForConfigChanges(@NonNull ActivityPluginBinding binding) {
         activity = binding.getActivity();
     }
 
     @Override
     public void onDetachedFromActivity() {
+        activity = null;
+    }
 
+    private boolean ensureActivity(Result result) {
+        if (activity == null) {
+            result.error("no_activity", "FlutterShareMePlugin requires a foreground activity.", "");
+            return false;
+        }
+        return true;
     }
 
     ///Utils methods
