@@ -1,9 +1,9 @@
-group 'zhuoyuan.li.fluttershareme'
-version '1.0-SNAPSHOT'
-
 plugins {
     id 'com.android.library' version '8.5.1'
 }
+
+group 'zhuoyuan.li.fluttershareme'
+version '1.0-SNAPSHOT'
 
 repositories {
     google()
